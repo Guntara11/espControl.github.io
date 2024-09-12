@@ -3,37 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESP32 Control</title>
+    <title>ESP32 OTA Update Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-    <h1>ESP32 Control</h1>
-    <button onclick="controlBoard1()">Control Board 1</button>
-    <button onclick="controlBoard2()">Control Board 2</button>
+    <div class="container">
+        <h1>ESP32 OTA Update Platform</h1>
+        <p>Click the button below to update your ESP32 firmware.</p>
+        
+        <button class="button" onclick="triggerOTAUpdate()">Update ESP32 Firmware</button>
+
+        <p class="status" id="status">Status: Waiting for update...</p>
+    </div>
 
     <script>
-        function controlBoard1() {
-            fetch('http://your-board1-public-url/action', { method: 'GET' })
-            .then(response => {
-                if(response.ok) {
-                    alert("Board 1 controlled successfully!");
-                } else {
-                    alert("Failed to control Board 1.");
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
+        async function triggerOTAUpdate() {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = 'Status: Checking for updates...';
 
-        function controlBoard2() {
-            fetch('http://your-board2-public-url/action', { method: 'GET' })
-            .then(response => {
-                if(response.ok) {
-                    alert("Board 2 controlled successfully!");
+            // URL of the ESP32 OTA endpoint
+            const esp32_url = 'http://esp32-device-ip-address/update';
+
+            try {
+                const response = await fetch(esp32_url, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    statusElement.textContent = 'Status: OTA update triggered successfully!';
                 } else {
-                    alert("Failed to control Board 2.");
+                    statusElement.textContent = `Status: Failed to trigger update. Error code: ${response.status}`;
                 }
-            })
-            .catch(error => console.error('Error:', error));
+            } catch (error) {
+                statusElement.textContent = 'Status: Error triggering update. Please check the ESP32 connection.';
+            }
         }
     </script>
 </body>
-</html>
